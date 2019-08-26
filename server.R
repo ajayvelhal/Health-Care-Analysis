@@ -217,7 +217,7 @@ server <-shinyServer(function(input, output,session) {
     })
      
      #Pie graph for Admitted
-     output$adm<- renderPlot({
+     output$adm<- renderPlotly({
        admit<- data()%>% filter(data()$Year==input$year3) %>% select(Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
        admit_res <- data.frame(list(c(admit)))
        print(admit_res)
@@ -232,14 +232,15 @@ server <-shinyServer(function(input, output,session) {
        textinfo = 'label+percent',
        insidetextfont = list(color = '#FFFFFF'),
        hoverinfo = 'text',
-       text = ~paste('$', mean_adm, '%'),
+       text = ~paste(Diseases),
        marker = list(colors = colors,
                      line = list(color = '#FFFFFF', width = 1)),
        #The 'pull' attribute can also be used to create space between the sectors
-       showlegend = FALSE) %>%
-       layout(title = 'United States Personal Expenditures by Categories in 1960',
+       showlegend = TRUE) %>%
+       layout(title = 'Patient Admitted',
               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+       
        # chart_link = api_create(p, filename="pie-styled")
        # chart_link
        # a <- sum_adm[-1]

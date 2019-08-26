@@ -96,7 +96,7 @@ ui <-dashboardPage(skin = "black",
                           tabName = "widgets4",
                             #selectInput('month',"Select Month",""),
                           selectInput('year3',"Select Year",""),
-                          plotOutput("adm")
+                          plotlyOutput("adm",height = '500px')
                         ),
                         tabItem(
                           tabName = "widgets5",
