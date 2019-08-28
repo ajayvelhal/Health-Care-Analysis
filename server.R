@@ -52,6 +52,11 @@ server <-shinyServer(function(input, output,session) {
     updateSelectInput(session,inputId = 'cat2',label = "Select Category",choices = names(df[8:11]),selected = names(df[8:11]))
     updateSelectInput(session,inputId = 'year3', label='Select Year', choices = df$Year, selected = df$Year)
     updateSelectInput(session,inputId = 'year4', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'year5', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'year6', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'year7', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'year8', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'dis', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
     return(df)
     
     
@@ -212,7 +217,7 @@ server <-shinyServer(function(input, output,session) {
        linear <- lm(mean_adm ~ mean_death,lgr_bind_final)
        print(summary(linear))
        
-       ggplot(lgr_bind_final,aes(mean_adm,mean_death)) + geom_point() + geom_smooth(method = "lm")
+       ggplot(lgr_bind_final,aes(mean_death,mean_adm)) + geom_point() + geom_smooth(method = "lm")
       
     })
      
@@ -254,6 +259,67 @@ server <-shinyServer(function(input, output,session) {
        # 
        
      })
+     
+     output$dea<- renderPlotly({
+       death<- data()%>% filter(data()$Year==input$year3) %>% select(Diseases,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+       death_res <- data.frame(list(c(death)))
+       print(death_res)
+       
+       colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
+       
+       sum_death<- death_res %>% group_by(Diseases) %>% summarise(mean_death=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
+       print(sum_death)
+       
+       p<- plot_ly(sum_death,labels=~Diseases,values= ~mean_death,type='pie',
+                   textposition = 'inside',
+                   textinfo = 'label+percent',
+                   insidetextfont = list(color = '#FFFFFF'),
+                   hoverinfo = 'text',
+                   text = ~paste(Diseases),
+                   marker = list(colors = colors,
+                                 line = list(color = '#FFFFFF', width = 1)),
+                   #The 'pull' attribute can also be used to create space between the sectors
+                   showlegend = TRUE) %>%
+         layout(title = 'Patients Died',
+                xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+       
+       # chart_link = api_create(p, filename="pie-styled")
+       # chart_link
+       # a <- sum_adm[-1]
+       # print(a)
+       # 
+       # pie(a,Diseases)
+       # pct<- round(sum_adm/sum(sum_adm)*100)
+       # lbls<- paste(Diseases,pct)
+       # lbls<- paste(labls,"%",sep="")
+       # pie(sum_adm,labels = lbls,col=rainbow,main="Overall Admitted Patients")
+       # 
+       
+     })
+     
+     #monthly trend
+     
+     output$year_male<- renderPlotly({
+       adm<- data()%>% filter(data()$Disease==input$dis) %>% select(Month,Year,Admitted_Male)
+       adm_res<- data.frame(list(c(adm)))
+       print(adm_res)
+       
+       # R <- sort(adm_res$Month)
+       
+       # R <- adm_res%>% arrange(match(Month,month.name))
+       # print(R)
+       
+       Month_ordered <- ordered(adm_res$Month,month.name)
+      #ggplot(adm_res) + geom_line(mapping = aes(x=Month,y=Admitted_Male,colour=variable))
+       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Male, type = 'scatter', mode = 'lines',showlegend= TRUE)%>% 
+       
+         layout(title = 'Patients Admitted (Male)',
+                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE),
+                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE))
+       
+     })
+     
   }) # observe ends
   
   

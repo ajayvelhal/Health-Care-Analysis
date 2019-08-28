@@ -28,7 +28,12 @@ ui <-dashboardPage(skin = "black",
                       ),
                         menuItem("Linear Regression", tabName = "widgets3", icon = icon("th")),
                         menuItem("Admission Year Vise", tabName = "widgets4", icon = icon("th")),
-                        menuItem("Death Year Vise", tabName = "widgets5", icon = icon("th"))
+                        menuItem("Death Year Vise", tabName = "widgets5", icon = icon("th")),
+                        menuItem("Month Trend", tabName = "widgets6", icon = icon("th"),
+                                 menuSubItem("Male",tabName = "Male",icon = icon("angle-double-right")),
+                                 menuSubItem("Female",tabName = "Female",icon = icon("angle-double-right")),
+                                 menuSubItem("Male Child",tabName = "Male_Child",icon = icon("angle-double-right")),
+                                 menuSubItem("Female Child",tabName = "Female_Child",icon = icon("angle-double-right")))
                       
                       )
                     ),
@@ -102,7 +107,32 @@ ui <-dashboardPage(skin = "black",
                           tabName = "widgets5",
                           #selectInput('month',"Select Month",""),
                           selectInput('year4',"Select Year",""),
-                          plotOutput("dea")
+                          plotlyOutput("dea",height = '500px')
+                        ),
+                        
+                        tabItem(
+                          tabName = "widgets6"
+                        ),
+                        tabItem(
+                          tabName = "Male",
+                          # radioButtons("rd2",label = "Year",choices = list("2017"="2017","2018"="2018"),selected = "2017"),
+                          selectInput('dis','Select Disease',""),
+                          plotlyOutput("year_male",height = '450px')
+                        ),
+                        tabItem(
+                          tabName = "Female",
+                          selectInput('year6','Select Year',""),
+                          plotOutput("year_female",height = '600px')
+                        ),
+                        tabItem(
+                          tabName = "Male_Child",
+                          selectInput('year7','Select Year',""),
+                          plotOutput("year_male_child",height = '600px')
+                        ),
+                        tabItem(
+                          tabName = "Female_Child",
+                          selectInput('year8','Select Year',""),
+                          plotOutput("year_female_child",height = '600px')
                         )
                         )
                       )
