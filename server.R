@@ -57,6 +57,9 @@ server <-shinyServer(function(input, output,session) {
     updateSelectInput(session,inputId = 'year7', label='Select Year', choices = df$Year, selected = df$Year)
     updateSelectInput(session,inputId = 'year8', label='Select Year', choices = df$Year, selected = df$Year)
     updateSelectInput(session,inputId = 'dis', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
+    updateSelectInput(session,inputId = 'dis1', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
+    updateSelectInput(session,inputId = 'dis2', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
+    updateSelectInput(session,inputId = 'dis3', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
     return(df)
     
     
@@ -261,7 +264,7 @@ server <-shinyServer(function(input, output,session) {
      })
      
      output$dea<- renderPlotly({
-       death<- data()%>% filter(data()$Year==input$year3) %>% select(Diseases,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+       death<- data()%>% filter(data()$Year==input$year4) %>% select(Diseases,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
        death_res <- data.frame(list(c(death)))
        print(death_res)
        
@@ -301,7 +304,7 @@ server <-shinyServer(function(input, output,session) {
      #monthly trend
      
      output$year_male<- renderPlotly({
-       adm<- data()%>% filter(data()$Disease==input$dis) %>% select(Month,Year,Admitted_Male)
+       adm<- data()%>% filter(data()$Disease==input$dis) %>% select(Year,Month,Admitted_Male)
        adm_res<- data.frame(list(c(adm)))
        print(adm_res)
        
@@ -312,14 +315,149 @@ server <-shinyServer(function(input, output,session) {
        
        Month_ordered <- ordered(adm_res$Month,month.name)
       #ggplot(adm_res) + geom_line(mapping = aes(x=Month,y=Admitted_Male,colour=variable))
-       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Male, type = 'scatter', mode = 'lines',showlegend= TRUE)%>% 
+       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Male, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
+         
        
          layout(title = 'Patients Admitted (Male)',
                 xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE),
                 yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE))
        
      })
+     output$year_female<- renderPlotly({
+       adm<- data()%>% filter(data()$Disease==input$dis1) %>% select(Year,Month,Admitted_Female)
+       adm_res<- data.frame(list(c(adm)))
+       print(adm_res)
+       
+       # R <- sort(adm_res$Month)
+       
+       # R <- adm_res%>% arrange(match(Month,month.name))
+       # print(R)
+       
+       Month_ordered <- ordered(adm_res$Month,month.name)
+       #ggplot(adm_res) + geom_line(mapping = aes(x=Month,y=Admitted_Male,colour=variable))
+       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Female, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
+         
+         
+         layout(title = 'Patients Admitted (Female)',
+                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE),
+                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE))
+       
+     })
      
+     output$year_male_child<- renderPlotly({
+       adm<- data()%>% filter(data()$Disease==input$dis2) %>% select(Year,Month,Admitted_Male_Child)
+       adm_res<- data.frame(list(c(adm)))
+       print(adm_res)
+       
+       # R <- sort(adm_res$Month)
+       
+       # R <- adm_res%>% arrange(match(Month,month.name))
+       # print(R)
+       
+       Month_ordered <- ordered(adm_res$Month,month.name)
+       #ggplot(adm_res) + geom_line(mapping = aes(x=Month,y=Admitted_Male,colour=variable))
+       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Male_Child, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
+         
+         
+         layout(title = 'Patients Admitted (Male Child)',
+                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE),
+                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE))
+       
+     })
+     output$year_female_child<- renderPlotly({
+       adm<- data()%>% filter(data()$Disease==input$dis3) %>% select(Year,Month,Admitted_Female_Child)
+       adm_res<- data.frame(list(c(adm)))
+       print(adm_res)
+       
+       # R <- sort(adm_res$Month)
+       
+       # R <- adm_res%>% arrange(match(Month,month.name))
+       # print(R)
+       
+       Month_ordered <- ordered(adm_res$Month,month.name)
+       #ggplot(adm_res) + geom_line(mapping = aes(x=Month,y=Admitted_Male,colour=variable))
+       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Female_Child, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
+              layout(title = 'Patients Admitted (Male)',
+                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE),
+                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE))
+       
+     })
+     
+     #Clustering final
+     output$scat<- renderPlotly({
+       admit<- data()%>% filter(data()$Year=='2018') %>% select(Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+       admit_res <- data.frame(list(c(admit)))
+       #print(admit_res)
+       
+       colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
+       
+       sum_adm<- admit_res %>% group_by(Diseases) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       #print(sum_adm)
+       #print(mean_adm)
+       
+       death<- data()%>% filter(data()$Year=='2018') %>% select(Diseases,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+       death_res <- data.frame(list(c(death)))
+       #print(death_res)
+       
+       #colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
+       
+       sum_death<- death_res %>% group_by(Diseases) %>% summarise(mean_death=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
+       #print(sum_death)
+       
+       bin <- cbind(sum_adm,sum_death)
+       print(bin)
+       
+       bin_f<- bin[-1]
+       #print(bin_f)
+       
+       bin_ff<- bin_f[-2]
+       print(bin_ff)
+       
+       a <- scale(bin_ff)
+       print(head(a))
+       
+       a_rest<- data.frame((a))
+       print(head(a_rest))
+       # a<-apply(sum_adm,2,mean)
+       # s<-apply(sum_adm,2,sd)
+       # sum_adm<-scale(sum_adm,a,s)
+       # 
+       # distance <- dist(sum_adm)
+       # print(distance,digits = 5)
+       #ggplot(a_rest,aes(a_rest$mean_adm,a_rest$mean_death)) + geom_point() + theme_classic()
+       #s <- seq(-1, 10)
+       #p <- plot_ly(data = a_rest, x = ~a_rest$mean_adm, y = ~a_rest$mean_death)
+       
+       results<- kmeans(a_rest,4)
+       print(results)
+       
+       print(results$size)
+       
+       print(results$cluster)
+       print(table(bin$Diseases,results$cluster))
+       # set.seed(123)
+       # k.max<- 15
+       # data<- a_rest
+       # 
+       # wss <- sapply(1:k.max, function(k){
+       #   kmeans(data,k,nstart=50,iter.max = 15)$tot.withinss
+       # })
+       # wssplot(1:k.max, wss,
+       #         type="b", pch = 19, frame = FALSE, 
+       #         xlab="Number of clusters K",
+       #         ylab="Total within-clusters sum of squares")
+       
+       # fviz_nbclust(a_rest, kmeans, method = "wss") +
+       #   geom_vline(xintercept = 4, linetype = 2)+
+       #   labs(subtitle = "Elbow method")
+       # fviz_nbclust(a_rest, kmeans, method = "silhouette")+
+       #   labs(subtitle = "Silhouette method")
+       # set.seed(123)
+       # fviz_nbclust(a_rest, kmeans, nstart = 25,  method = "gap_stat", nboot = 50)+
+       #   labs(subtitle = "Gap statistic method")
+       clusplot(a_rest,results$cluster,main = '2D Representation',labels = 2,lines = 0)
+       # plot3d(pcdf$scores, col=newdf$K)#Create a 3D plot
+     })
   }) # observe ends
   
   
