@@ -56,6 +56,9 @@ server <-shinyServer(function(input, output,session) {
     updateSelectInput(session,inputId = 'year6', label='Select Year', choices = df$Year, selected = df$Year)
     updateSelectInput(session,inputId = 'year7', label='Select Year', choices = df$Year, selected = df$Year)
     updateSelectInput(session,inputId = 'year8', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'year9', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'yearrr', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'diss', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
     updateSelectInput(session,inputId = 'dis', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
     updateSelectInput(session,inputId = 'dis1', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
     updateSelectInput(session,inputId = 'dis2', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
@@ -71,11 +74,13 @@ server <-shinyServer(function(input, output,session) {
     result<-data.frame(list(c(res)))
     #print(result)
     
-    plot2<- data()%>%filter(data()$Disease == input$disease & data()$Year == input$year1) %>% select(Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+    plot2<- data()%>%filter(data()$Disease == input$disease & data()$Year == input$year2) %>% select(Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
     plot2dis<- data.frame(list(c(plot2)))
     #plot2dis$month<- factor(plot2dis$month,levels = month.abb)
     #print(input$month)
     print(plot2dis)
+    
+    Month_ordered <- ordered(plot2dis$Month,month.name)
     
     #plot_trans<- as.data.frame(t(plot2dis))
     #print(plot_trans)
@@ -87,10 +92,45 @@ server <-shinyServer(function(input, output,session) {
     #plot2dis.long <- melt(plot2dis,"facet")
     #print(plot2dis.long)
     
-    output$plot1<- renderPlot({
-      ggplot(result,aes(Diseases,Admitted_Male)) + geom_point() + theme_classic()
-      
-    })
+    # output$plot1<- renderPlot({
+    #   ggplot(result,aes(Diseases,Admitted_Male)) + geom_point() + theme_classic()
+    #   
+    # })
+    #Linear Regression Reference
+    lgrres <- data()%>%filter(data()$Diseases == input$diss & data()$Year==input$yearrr) %>% select(Month,Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+    lrgs <- data.frame(list(c(lgrres)))
+    #glimpse(lrgs)   
+    
+    #Sum of admitted patients
+    # sum_adm<- lgrres %>% group_by(Month,Diseases) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+    # print(sum_adm)
+    # 
+    sum_dis<- lgrres %>% group_by(Month) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+    print(sum_dis)
+    # class(Month)
+    # 
+    # levels(Month)
+    # tb<- full_join(sum_adm,sum_dis,by="Month")
+    # print(tb)
+    sum_dis$Month=as.numeric(sum_dis$Month)
+    # sum_adm$Diseases=as.numeric(sum_adm$Diseases)
+    str(sum_dis)
+    # print(sum_adm)
+    # sc<- scale(sum_adm)
+    # print(sc)
+    # 
+    # sc_frame<- data.frame(sc)
+    #Month_ordered <- ordered(lgrs$Month,month.name)
+    #Sum of deaths of patients
+    # sum_death<- lgrres %>% group_by(Month) %>% summarise(mean_death=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
+    # print(sum_death)
+    # 
+    # 
+    # lgr_bind<- cbind(sum_adm,sum_dis)
+    # print(lgr_bind)
+    # 
+    # lgr_bind_final<- lgr_bind[-3]
+    # print(lgr_bind_final)
     
     colours <- c("red", "orange", "blue")
     
@@ -102,17 +142,21 @@ server <-shinyServer(function(input, output,session) {
     #print(plot2dis)
     
     output$view_male<- renderPlot({
-     ggplot(plot2dis,aes(x=Month,y=Admitted_Male)) + geom_bar(stat="identity") 
+     ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Male)) + geom_bar(stat="identity") + xlab("Month") +
+        ylab("Admitted Male Patients") 
     })
     
     output$view_female<- renderPlot({
-      ggplot(plot2dis,aes(x=Month,y=Admitted_Female)) + geom_bar(stat="identity") 
+      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Female)) + geom_bar(stat="identity") + xlab("Month") +
+        ylab("Admitted Female Patients") 
     })
     output$view_male_child<- renderPlot({
-      ggplot(plot2dis,aes(x=Month,y=Admitted_Male_Child)) + geom_bar(stat="identity") 
+      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Male_Child)) + geom_bar(stat="identity") + xlab("Month") +
+        ylab("Admitted Male-Child Patients") 
     })
     output$view_female_child <- renderPlot({
-      ggplot(plot2dis,aes(x=Month,y=Admitted_Female_Child)) + geom_bar(stat="identity") 
+      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Female_Child)) + geom_bar(stat="identity") + xlab("Month") +
+        ylab("Admitted Female-Child Patients") 
     })
     
     #Clustering
@@ -198,31 +242,101 @@ server <-shinyServer(function(input, output,session) {
     #Linear Regression
     
      output$lgr <- renderPlot({
-       lgrres <- data()%>%filter(data()$Year == input$rd1) %>% select(Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+       lgrres <- data()%>%filter(data()$Diseases == input$diss & data()$Year==input$yearrr) %>% select(Month,Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
        lrgs <- data.frame(list(c(lgrres)))
        #glimpse(lrgs)   
        
        #Sum of admitted patients
-       sum_adm<- lgrres %>% group_by(Month) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
-       print(sum_adm)
-       
+       # sum_adm<- lgrres %>% group_by(Month,Diseases) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       # print(sum_adm)
+       # 
+        sum_dis<- lgrres %>% group_by(Month) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+        print(sum_dis)
+       # class(Month)
+       # 
+       # levels(Month)
+       # tb<- full_join(sum_adm,sum_dis,by="Month")
+       # print(tb)
+       sum_dis$Month=as.numeric(sum_dis$Month)
+       # sum_adm$Diseases=as.numeric(sum_adm$Diseases)
+       str(sum_dis)
+       # print(sum_adm)
+       # sc<- scale(sum_adm)
+       # print(sc)
+       # 
+       # sc_frame<- data.frame(sc)
+       #Month_ordered <- ordered(lgrs$Month,month.name)
        #Sum of deaths of patients
-       sum_death<- lgrres %>% group_by(Month) %>% summarise(mean_death=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
-       print(sum_death)
+       # sum_death<- lgrres %>% group_by(Month) %>% summarise(mean_death=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
+       # print(sum_death)
+       # 
+       # 
+       # lgr_bind<- cbind(sum_adm,sum_dis)
+       # print(lgr_bind)
+       # 
+       # lgr_bind_final<- lgr_bind[-3]
+       # print(lgr_bind_final)
        
        
-       lgr_bind<- cbind(sum_adm,sum_death)
-       print(lgr_bind)
+       # #  
        
-       lgr_bind_final<- lgr_bind[-3]
-       print(lgr_bind_final)
+       # tb$Month = as.factor(tb$Month)
+       # str(tb)
+       # b<- ordered(tb$Month,month.abb)
+       # print(b)
        
-       linear <- lm(mean_adm ~ mean_death,lgr_bind_final)
-       print(summary(linear))
-       
-       ggplot(lgr_bind_final,aes(mean_death,mean_adm)) + geom_point() + geom_smooth(method = "lm")
+    
+       ggplot(sum_dis,aes(Month,mean_adm)) + geom_point() + geom_smooth(method = "lm")
       
+       
     })
+     output$txt<- renderPrint({
+       lgrres <- data()%>%filter(data()$Diseases == input$diss & data()$Year==input$yearrr) %>% select(Month,Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+       lrgs <- data.frame(list(c(lgrres)))
+       #glimpse(lrgs)   
+       
+       #Sum of admitted patients
+       # sum_adm<- lgrres %>% group_by(Month,Diseases) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       # print(sum_adm)
+       # 
+       sum_dis<- lgrres %>% group_by(Month) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       #print(sum_dis)
+       # class(Month)
+       # 
+       # levels(Month)
+       # tb<- full_join(sum_adm,sum_dis,by="Month")
+       # print(tb)
+       sum_dis$Month=as.numeric(sum_dis$Month)
+       # sum_adm$Diseases=as.numeric(sum_adm$Diseases)
+       #str(sum_dis)
+       linear <- lm(mean_adm~Month,sum_dis)
+       print(summary(linear))
+       #print(summary(predict(linear,sum_dis,interval="predict")))
+       #print(predict(lm((Month~mean_adm), sum_dis, interval = "prediction")))
+     })
+     output$txt1<- renderPrint({
+       lgrres <- data()%>%filter(data()$Diseases == input$diss & data()$Year==input$yearrr) %>% select(Month,Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+       lrgs <- data.frame(list(c(lgrres)))
+       #glimpse(lrgs)   
+       
+       #Sum of admitted patients
+       # sum_adm<- lgrres %>% group_by(Month,Diseases) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       # print(sum_adm)
+       # 
+       sum_dis<- lgrres %>% group_by(Month) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       #print(sum_dis)
+       # class(Month)
+       # 
+       # levels(Month)
+       # tb<- full_join(sum_adm,sum_dis,by="Month")
+       # print(tb)
+       sum_dis$Month=as.numeric(sum_dis$Month)
+       # sum_adm$Diseases=as.numeric(sum_adm$Diseases)
+       #str(sum_dis)
+       linear <- lm(mean_adm~Month,sum_dis)
+       #print(summary(linear))
+       print(predict(linear,Month='12',interval="predict"))
+     })
      
      #Pie graph for Admitted
      output$adm<- renderPlotly({
@@ -232,23 +346,28 @@ server <-shinyServer(function(input, output,session) {
        
        colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
        
-       sum_adm<- admit_res %>% group_by(Diseases) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       sum_adm<- admit_res %>% group_by(Diseases) %>% summarise(mean_male=mean(Admitted_Male),mean_female=mean(Admitted_Female),mean_child_male=mean(Admitted_Male_Child),mean_child_female=mean(Admitted_Female_Child))
        print(sum_adm)
        
-       p<- plot_ly(sum_adm,labels=~Diseases,values= ~mean_adm,type='pie',
-       textposition = 'inside',
-       textinfo = 'label+percent',
-       insidetextfont = list(color = '#FFFFFF'),
-       hoverinfo = 'text',
-       text = ~paste(Diseases),
-       marker = list(colors = colors,
-                     line = list(color = '#FFFFFF', width = 1)),
-       #The 'pull' attribute can also be used to create space between the sectors
-       showlegend = TRUE) %>%
-       layout(title = 'Patient Admitted',
-              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+       sum_admm <- sum_adm %>% group_by(Diseases) %>% summarise(sum_add=sum(mean_male,mean_female,mean_child_male,mean_child_female))
+       print(sum_admm)
+       # b<- sum_adm %>% group_by(Diseases) %>% summarise_at(vars(mean_adm),mean)
+       # print(b)
        
+         p<- plot_ly(sum_admm,labels=~Diseases,values= ~sum_add,type='pie',
+         textposition = 'inside',
+         textinfo = 'label+percent',
+         insidetextfont = list(color = '#FFFFFF'),
+         hoverinfo = 'text',
+         text = ~paste(Diseases),
+         marker = list(colors = colors,
+                       line = list(color = '#FFFFFF', width = 1)),
+         #The 'pull' attribute can also be used to create space between the sectors
+         showlegend = TRUE) %>%
+         layout(title = 'Patient Admitted',
+                xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+                yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE))
+        
        # chart_link = api_create(p, filename="pie-styled")
        # chart_link
        # a <- sum_adm[-1]
@@ -383,8 +502,53 @@ server <-shinyServer(function(input, output,session) {
        
      })
      
+     output$day<- renderPlotly({
+       admit<- data()%>% filter(data()$Year==input$year9) %>% select(Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+       admit_res <- data.frame(list(c(admit)))
+       print(admit_res)
+       
+       sum_adm <- admit_res%>% group_by(input$year9,Diseases) %>% summarise(sum_admm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       sum_year<- admit_res%>% group_by(input$year9) %>% summarise(sum_admm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       sum_death<- admit_res%>% group_by(input$year9) %>% summarise(sum_admm=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
+       print(sum_adm)
+       print(sum_year)
+       print(sum_death)
+       
+       b<- sum_adm[-1:-2]
+       print(b)
+       
+       c<- b/365
+       print(c)
+       
+       roun<- round(c,digits=2)
+       print(roun)
+       print(sum_adm$sum_admm <- ifelse(is.na(roun$sum_admm), sum_adm$sum_adm, roun$sum_admm))
+       
+       print(sum_adm)
+       p<- plot_ly(sum_adm,labels=~Diseases,values= ~sum_admm,type='pie',
+                   textposition = 'inside',
+                   textinfo = 'label',
+                   insidetextfont = list(color = '#FFFFFF'),
+                   hoverinfo = 'text',
+                   text = ~paste(Diseases,sum_admm),
+                   marker = list(colors = colors,
+                                 line = list(color = '#FFFFFF', width = 1)),
+                   #The 'pull' attribute can also be used to create space between the sectors
+                   showlegend = TRUE) %>%
+         layout(title = 'Patients Died',
+                xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+       
+       # d<- sum_adm[-3]
+       # print(d)
+       # 
+       # e<- cbind(d,c)
+       # print(e)
+       
+     })
+     
      #Clustering final
-     output$scat<- renderPlotly({
+     output$scat<- renderPlot({
        admit<- data()%>% filter(data()$Year=='2018') %>% select(Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
        admit_res <- data.frame(list(c(admit)))
        #print(admit_res)
@@ -428,34 +592,35 @@ server <-shinyServer(function(input, output,session) {
        #s <- seq(-1, 10)
        #p <- plot_ly(data = a_rest, x = ~a_rest$mean_adm, y = ~a_rest$mean_death)
        
-       results<- kmeans(a_rest,4)
+       results<- kmeans(a_rest,4,nstart=25)
        print(results)
        
        print(results$size)
        
        print(results$cluster)
        print(table(bin$Diseases,results$cluster))
-       # set.seed(123)
-       # k.max<- 15
-       # data<- a_rest
+       # # set.seed(123)
+       # # k.max<- 15
+       # # data<- a_rest
+       # # 
+       # # wss <- sapply(1:k.max, function(k){
+       # #   kmeans(data,k,nstart=50,iter.max = 15)$tot.withinss
+       # # })
+       # # wssplot(1:k.max, wss,
+       # #         type="b", pch = 19, frame = FALSE, 
+       # #         xlab="Number of clusters K",
+       # #         ylab="Total within-clusters sum of squares")
        # 
-       # wss <- sapply(1:k.max, function(k){
-       #   kmeans(data,k,nstart=50,iter.max = 15)$tot.withinss
-       # })
-       # wssplot(1:k.max, wss,
-       #         type="b", pch = 19, frame = FALSE, 
-       #         xlab="Number of clusters K",
-       #         ylab="Total within-clusters sum of squares")
-       
-       # fviz_nbclust(a_rest, kmeans, method = "wss") +
-       #   geom_vline(xintercept = 4, linetype = 2)+
-       #   labs(subtitle = "Elbow method")
-       # fviz_nbclust(a_rest, kmeans, method = "silhouette")+
-       #   labs(subtitle = "Silhouette method")
+       # # fviz_nbclust(a_rest, kmeans, method = "wss") +
+       # #   geom_vline(xintercept = 4, linetype = 2)+
+       # #   labs(subtitle = "Elbow method")
+       # # fviz_nbclust(a_rest, kmeans, method = "silhouette")+
+       # #   labs(subtitle = "Silhouette method")
        # set.seed(123)
        # fviz_nbclust(a_rest, kmeans, nstart = 25,  method = "gap_stat", nboot = 50)+
        #   labs(subtitle = "Gap statistic method")
-       clusplot(a_rest,results$cluster,main = '2D Representation',labels = 2,lines = 0)
+       #clusplot(a_rest,results$cluster,main = '2D Representation',labels = 2,lines = 0)
+       fviz_cluster(results,data=a_rest)
        # plot3d(pcdf$scores, col=newdf$K)#Create a 3D plot
      })
   }) # observe ends

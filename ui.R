@@ -23,22 +23,23 @@ ui <-dashboardPage(skin = "green",
                       sidebarMenu(
                         menuItem("Upload Data File ", tabName = "dashboard", icon = icon("fas fa-upload")),
                         menuItem("Home Page", tabName = "widgets", icon = icon("fas fa-home")),
-                        menuItem("Diseases", tabName = "disease", icon = icon("th"),
+                        menuItem("Diseases", tabName = "disease", icon = icon("fas fa-chart-bar"),
                                  menuSubItem("Adult",tabName = "Adult",icon = icon("fas fa-user")),
                                  menuSubItem("Child",tabName = "Child",icon = icon("fas fa-child"))),
-                        menuItem("Aggregation", tabName = "widgets2", icon = icon("th"),
+                        menuItem("Aggregation", tabName = "widgets2", icon = icon("fas fa-network-wired"),
                                  menuSubItem("Admitted",tabName = "Admitted",icon = icon("fas fa-user-injured")),
                                  menuSubItem("Death",tabName = "Death",icon = icon("angle-double-right"))
                       ),
-                        menuItem("Linear Regression", tabName = "widgets3", icon = icon("th")),
-                        menuItem("Admission Year Vise", tabName = "widgets4", icon = icon("th")),
-                        menuItem("Death Year Vise", tabName = "widgets5", icon = icon("th")),
-                        menuItem("Month Trend", tabName = "widgets6", icon = icon("th"),
+                        menuItem("Linear Regression", tabName = "widgets3", icon = icon("fas fa-chart-bar")),
+                        menuItem("Admission Year Vise", tabName = "widgets4", icon = icon("fas fa-chart-pie")),
+                        menuItem("Death Year Vise", tabName = "widgets5", icon = icon("fas fa-chart-pie")),
+                        menuItem("Month Trend", tabName = "widgets6", icon = icon("fas fa-chart-line"),
                                  menuSubItem("Male",tabName = "Male",icon = icon("fas fa-male")),
                                  menuSubItem("Female",tabName = "Female",icon = icon("fas fa-female")),
                                  menuSubItem("Male Child",tabName = "Male_Child",icon = icon("fas fa-child")),
                                  menuSubItem("Female Child",tabName = "Female_Child",icon = icon("fas fa-child"))),
-                      menuItem("Clustering", tabName = "widgets7", icon = icon("th"))
+                      menuItem("Average Daily Patients", tabName = "widgets8", icon = icon("fas fa-chart-pie")),
+                      menuItem("Clustering", tabName = "widgets7", icon = icon("far fa-object-group"))
                       
                       )
                     ),
@@ -84,9 +85,6 @@ ui <-dashboardPage(skin = "green",
                               footer = fileInput("file_da","Upload A CSV File",accept = c("text/csv","text/comma-separated-values","text/plain",".csv"))
                             ))  
                           ),
-                          
-                        
-                        
                           fluidRow(
                             column(
                               width=12,
@@ -95,30 +93,42 @@ ui <-dashboardPage(skin = "green",
                                 plotOutput('da',height = "400px")  
                               )
                             )
-                           
-                            
                           )
-                        
-                        
-                        
-                        
                         ),
                         tabItem(
                           tabName = "widgets",
-                          # selectInput('month',"Select Month",""),
-                          # selectInput('year1',"Select Year",""),
-                          fluidRow(
-                            infoBox("Sales",1000,icon = icon("warning"))
-                          ),
+                          selectInput('month',"Select Month",""),
+                          selectInput('year1',"Select Year",""),
+                          # fluidRow(
+                          #   infoBox("Sales",1000,icon = icon("warning"))
+                          # ),
                           plotOutput("plot1")
                           ),
                         tabItem(
                           tabName = "Adult",
-                          selectInput('disease',"Select Disease",""),
-                          selectInput('year2',"Select Year",""),
-                          tabBox(
-                            tabPanel(title="Male",fluidRow(column(width=12,plotOutput("view_male")))),
-                            tabPanel("Female",fluidRow(column(width=12,plotOutput("view_female")))))
+                          fluidRow(
+                            box(
+                              selectInput('disease',"Select Disease","")
+                              )
+                            ),
+                          fluidRow(box(selectInput('year2',"Select Year",""))),
+                          tabBox(width = 10,selected = "Male",
+                            tabPanel(title="Male",
+                                     fluidRow(
+                                        column(
+                                          width=12,
+                                          plotOutput("view_male",height = '300px'))
+                                        )
+                                     ),
+                            tabPanel("Female",width=10,
+                                     fluidRow(
+                                       column(
+                                         width=12,
+                                         plotOutput("view_female",height = '300px')
+                                         )
+                                       )
+                                   )
+                            )
                           ),
                             
                         
@@ -149,10 +159,49 @@ ui <-dashboardPage(skin = "green",
                         
                         tabItem(
                           tabName = "widgets3",
-                          radioButtons("rd1",label = "Year",choices = list("2017"="2017","2018"="2018"),selected = "2017"),
+                          #radioButtons("rd1",label = "Year",choices = list("2017"="2017","2018"="2018"),selected = "2017"),
                           #selectInput('month',"Select Month",""),
+                          
+                          
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'green',
+                                selectInput('diss',"Select Disease","")
+                              ),
+                              box(
+                                background = 'green',
+                                selectInput('yearrr',"Select Year","")
+                              )
+                            )
+                          ),
+                        
+                          fluidRow(
+                            column(
+                              width=12,
+                              plotOutput("lgr",width = '1085px')
+                            )
+                          ),
+                          br(),
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'green',
+                                h3('Summary'),
+                                verbatimTextOutput('txt')
+                              ),
+                              box(
+                                background = 'green',
+                                h3('Prediction'),
+                                collapsible = TRUE,
+                                  verbatimTextOutput('txt1')
+                              )
+                            )
+                          )
                           #selectInput('year1',"Select Year",""),
-                          plotOutput("lgr")
+                          
                         ),
                         tabItem(
                           tabName = "widgets4",
@@ -194,7 +243,13 @@ ui <-dashboardPage(skin = "green",
                         tabItem(
                           tabName = "widgets7",
                           #selectInput('dis3','Select Disease',""),
-                          plotlyOutput("scat",height = '600px')
+                          plotOutput("scat",height = '600px')
+                        ),
+                        tabItem(
+                          tabName = "widgets8",
+                          #selectInput('month',"Select Month",""),
+                          selectInput('year9',"Select Year",""),
+                          plotlyOutput("day",height = '500px')
                         )
                         )
                       )
