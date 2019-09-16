@@ -180,7 +180,32 @@ ui <-dashboardPage(skin = "purple",
                         )
                         ),
                       tabItem(
-                        tabName = 'season'
+                        tabName = 'season',
+                        fluidRow(
+                          box(background = 'purple',
+                              selectInput('weather',"Select Season",choices = list("Winter"="winter","Monsoon"="monsoon","Summer"="Summer"))
+                              )
+                          ),
+                        br(),
+                        fluidRow(
+                          column(
+                            width=12,
+                            box(
+                              background = 'purple',
+                              title = "Patients admitted Season Wise",
+                              width=8,
+                              plotlyOutput("season12") 
+                            ),
+                            box(
+                              
+                              title = "Top 10 Diseases",
+                              width=4,
+                              tableOutput('home2') 
+                            )
+                          )
+                         #
+                          
+                        )
                       ),
                       tabItem(
                           tabName = "widgets2"

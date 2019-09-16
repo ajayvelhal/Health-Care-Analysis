@@ -130,6 +130,141 @@ server <-shinyServer(function(input, output,session) {
       
       female_child%>%tally(female_child$Admitted_Female_Child)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "Number of Admitted Female Child",color = 'purple')
     })
+    output$s1<- renderPlot({
+      paste("This")
+    })
+    #seasonal
+    
+    if(input$weather=='winter'){
+      win<-data()%>%filter(data()$Month=='October')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      win_res<-data.frame(list(c(win)))
+      print(win_res)
+      
+      win1<-data()%>%filter(data()$Month=='November')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      win_res1<-data.frame(list(c(win1)))
+      print(win_res1)
+      
+      win2<-data()%>%filter(data()$Month=='December')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      win_res2<-data.frame(list(c(win2)))
+      print(win_res2)
+      
+      win3<-data()%>%filter(data()$Month=='January')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      win_res3<-data.frame(list(c(win3)))
+      print(win_res3)
+      
+      sum_win<- rbind(win_res,win_res1,win_res2,win_res3)
+      print(sum_win)
+      add<- sum_win%>% group_by(Diseases)%>% summarise(sum_sum1=sum(Admitted_Male,Admitted_Female, Admitted_Male_Child, Admitted_Female_Child))
+      print(add)
+      data1<- add %>% arrange(desc(sum_sum1))
+      resultseason <- data.frame(list(c(data1)))
+      print(head(data1,10))
+      
+      #add_frame<- order(data.frame(add$sum_sum1))
+      # print(add_frame)
+      output$season12<- renderPlotly({
+        
+        # ggplot(resultseason,aes(x = Diseases,y = sum_sum1)) + 
+        #   geom_bar(stat="identity", fill="steelblue") + theme_light()
+        p<-plot_ly(resultseason,x = ~sum_sum1, y = ~Diseases, type = 'bar',orientation='h',color = 'black')%>%
+          layout(xaxis = list(title = 'Patients Count'),
+                 yaxis = list(title = 'Diseasess'))
+        
+      })
+      
+      output$home2<- renderTable({
+        print(head(data1,10))
+      })
+    }
+    else if(input$weather=='Summer'){
+      summ<-data()%>%filter(data()$Month=='February')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      summ_res<-data.frame(list(c(summ)))
+      #print(summ_res)
+      
+      summ1<-data()%>%filter(data()$Month=='March')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      summ_res1<-data.frame(list(c(summ1)))
+      #print(summ_res1)
+      
+      summ2<-data()%>%filter(data()$Month=='April')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      summ_res2<-data.frame(list(c(summ2)))
+      #print(summ_res2)
+      
+      summ3<-data()%>%filter(data()$Month=='May')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      summ_res3<-data.frame(list(c(summ3)))
+      #print(summ_res3)
+      
+      sum_sum<- rbind(summ_res,summ_res1,summ_res2,summ_res3)
+      #print(sum_sum)
+      
+      add<- sum_sum%>% group_by(Diseases)%>% summarise(sum_sum1=sum(Admitted_Male,Admitted_Female, Admitted_Male_Child, Admitted_Female_Child))
+      print(add)
+      data1<- add %>% arrange(desc(sum_sum1))
+      resultseason <- data.frame(list(c(data1)))
+      print(head(data1,10))
+      
+      #add_frame<- order(data.frame(add$sum_sum1))
+      # print(add_frame)
+      output$season12<- renderPlotly({
+        print("ajay ")
+        # ggplot(resultseason,aes(x = Diseases,y = sum_sum1)) + 
+        #   geom_bar(stat="identity", fill="steelblue") + theme_light()
+        p<-plot_ly(resultseason,x = ~sum_sum1, y = ~Diseases, type = 'bar',orientation='h',color = 'black')%>%
+           layout(xaxis = list(title = 'Average Admitted Per Month'),
+                  yaxis = list(title = 'Months'))
+      })
+      
+      output$home2<- renderTable({
+        print(head(data1,10))
+      })
+      
+      
+    }
+    
+    
+    else if(input$weather=='monsoon'){
+      mon<-data()%>%filter(data()$Month=='June')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      mon_res<-data.frame(list(c(mon)))
+      #print(mon_res)
+      
+      mon1<-data()%>%filter(data()$Month=='July')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      mon_res1<-data.frame(list(c(mon1)))
+      #print(mon_res1)
+      
+      mon2<-data()%>%filter(data()$Month=='August')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      mon_res2<-data.frame(list(c(mon2)))
+      #print(mon_res2)
+      
+      mon3<-data()%>%filter(data()$Month=='September')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+      mon_res3<-data.frame(list(c(mon3)))
+      #print(mon_res3)
+      
+      sum_mon<- rbind(mon_res,mon_res1,mon_res2,mon_res3)
+      #print(sum_mon)
+      
+      add<- sum_mon%>% group_by(Month)%>% summarise(sum_soon=sum(Admitted_Male,Admitted_Female, Admitted_Male_Child, Admitted_Female_Child))
+      print(add)
+      add<- sum_mon%>% group_by(Diseases)%>% summarise(sum_sum1=sum(Admitted_Male,Admitted_Female, Admitted_Male_Child, Admitted_Female_Child))
+      print(add)
+      data1<- add %>% arrange(desc(sum_sum1))
+      resultseason <- data.frame(list(c(data1)))
+      print(head(data1,10))
+      
+      #add_frame<- order(data.frame(add$sum_sum1))
+      # print(add_frame)
+      output$season12<- renderPlotly({
+        print("ajay ")
+        # ggplot(resultseason,aes(x = Diseases,y = sum_sum1)) + 
+        #   geom_bar(stat="identity", fill="steelblue") + theme_light()
+        p<-plot_ly(resultseason,x = ~sum_sum1, y = ~Diseases, type = 'bar',orientation='h',color = 'black')%>%
+          layout(xaxis = list(title = 'Average Admitted Per Month'),
+                 yaxis = list(title = 'Months'))
+      })
+      
+      output$home2<- renderTable({
+        print(head(data1,10))
+      })
+    }
+   
     
     
     plot2<- data()%>%filter(data()$Disease == input$disease & data()$Year == input$year2) %>% select(Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
@@ -226,7 +361,10 @@ server <-shinyServer(function(input, output,session) {
     #   plot(data()$Admitted_Male ~ data()$Death_Male)
     #   with(clust_res,text(Admitted_Male ~ Death_Male,labels= Diseases))
     # })
-    
+    #Seasonal Diseases
+    output$s1<- renderTable({
+      
+    })
     #aggregation of admitted persons
     output$aggr1 <- renderPlot({
       aggr<- data()%>% filter(data()$Year =='2017')%>% select(Diseases,input$cat)
