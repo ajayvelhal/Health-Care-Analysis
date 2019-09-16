@@ -23,11 +23,12 @@ ui <-dashboardPage(skin = "purple",
                       sidebarMenu(
                         menuItem("Upload Data File ", tabName = "dashboard", icon = icon("fas fa-upload")),
                         menuItem("Home Page", tabName = "widgets", icon = icon("fas fa-home")),
-                        menuItem("Diseases", tabName = "Adult", icon = icon("fas fa-chart-bar"),
+                        menuItem("Diseases", tabName = "Adult", icon = icon("fas fa-chart-bar")),
                         menuItem("Aggregation", tabName = "widgets2", icon = icon("fas fa-network-wired"),
                                  menuSubItem("Admitted",tabName = "Admitted",icon = icon("fas fa-user-injured")),
                                  menuSubItem("Death",tabName = "Death",icon = icon("angle-double-right"))
                       ),
+                      menuItem("Season", tabName = "season", icon = icon("fas fa-chart-bar")),
                         menuItem("Linear Regression", tabName = "widgets3", icon = icon("fas fa-chart-bar")),
                         menuItem("Admission Year Vise", tabName = "widgets4", icon = icon("fas fa-chart-pie")),
                         menuItem("Death Year Vise", tabName = "widgets5", icon = icon("fas fa-chart-pie")),
@@ -178,6 +179,9 @@ ui <-dashboardPage(skin = "purple",
                         
                         )
                         ),
+                      tabItem(
+                        tabName = 'season'
+                      ),
                       tabItem(
                           tabName = "widgets2"
                           #selectInput('cat',"Select Category",""),
@@ -339,6 +343,6 @@ ui <-dashboardPage(skin = "purple",
                         )
                         )
                       )
-                      
                     )
+                    
 
