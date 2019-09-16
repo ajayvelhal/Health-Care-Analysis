@@ -215,13 +215,57 @@ ui <-dashboardPage(skin = "purple",
                         ),
                         tabItem(
                           tabName = "Admitted",
-                          selectInput('cat','Select Category',""),
-                          plotOutput("aggr1",height = '600px')
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                               
+                                background = 'purple',
+                                selectInput('cat','Select Category',"")
+                              )
+                            )
+                          ),
+                          br(),
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                title="Aggregation for Admitted Patients",
+                                background = 'purple',
+                                width = 12,
+                                plotOutput("aggr1",height = '600px')
+                              )
+                            )
+                          )
+                          
+                         
                         ),
                         tabItem(
                           tabName = "Death",
-                          selectInput('cat2','Select Category',""),
-                          plotOutput("aggr2",height = '600px')
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'purple',
+                                selectInput('cat2','Select Category',"")
+                                
+                              )
+                            )
+                          ),
+                          br(),
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                width=12,
+                                title="Aggregation For Deaths",
+                                background = 'purple',
+                                plotOutput("aggr2",height = '600px')
+                              )
+                            )
+                          )
+                          
+                          
                         ),
                         
                         tabItem(
@@ -285,7 +329,7 @@ ui <-dashboardPage(skin = "purple",
                         fluidRow(
                           column(
                             width=12,
-                            box(
+                            box(title = 'Average Patients Admitted Yearly',background = 'purple',
                               width=12,
                               plotlyOutput("adm",height = '500px')
                             )
@@ -305,7 +349,7 @@ ui <-dashboardPage(skin = "purple",
                           fluidRow(
                             column(
                               width=12,
-                              box(
+                              box(title = 'Average Patients Death Yearly',background = 'purple',
                                 width = 12,
                                 plotlyOutput("dea",height = '500px')
                               )
@@ -319,24 +363,108 @@ ui <-dashboardPage(skin = "purple",
                         ),
                         tabItem(
                           tabName = "Male",
-                          #radioButtons("rd2",label = "Year",choices = list("2017"="2017","2018"="2018"),selected = "2017"),
-                          selectInput('dis','Select Disease',""),
-                          plotlyOutput("year_male",height = '600px')
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'purple',
+                                selectInput('dis','Select Disease',"")
+                              )
+                            )
+                          ),
+                          br(),
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                width=12,
+                                background = 'purple',
+                                title = 'Admitted Males Monthly',
+                                plotlyOutput("year_male")
+                                
+                              )
+                            )
+                          )
+                          
+                          
                         ),
                         tabItem(
                           tabName = "Female",
-                          selectInput('dis1','Select Disease',""),
-                          plotlyOutput("year_female",height = '600px')
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'purple',
+                                selectInput('dis1','Select Disease',"")
+                              )
+                            )
+                          ),
+                          br(),
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                width = 12,
+                                background = 'purple',
+                                title = 'Admitted Females Monthly',
+                                plotlyOutput("year_female")
+                              )
+                            )
+                          )
+                          
+                          
                         ),
                         tabItem(
                           tabName = "Male_Child",
-                          selectInput('dis2','Select Disease',""),
-                          plotlyOutput("year_male_child",height = '600px')
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'purple',
+                                selectInput('dis2','Select Disease',"")
+                              )
+                            )
+                          ),
+                          br(),
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'purple',
+                                width=12,
+                                title = 'Admitted Male Child Monthly',
+                                plotlyOutput("year_male_child")
+                              )
+                            )
+                          )
+                          
+                         
                         ),
                         tabItem(
                           tabName = "Female_Child",
-                          selectInput('dis3','Select Disease',""),
-                          plotlyOutput("year_female_child",height = '600px')
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'purple',
+                                selectInput('dis3','Select Disease',"")
+                              )
+                            )
+                          ),
+                          br(),
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'purple',
+                                width=12,
+                                title = 'Admitted Female Child Monthly',
+                                plotlyOutput("year_female_child")
+                              )
+                            )
+                          )
+                          
+                          
                         ),
                         tabItem(
                           tabName = "widgets7",

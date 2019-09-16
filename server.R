@@ -373,7 +373,7 @@ server <-shinyServer(function(input, output,session) {
       names(aggr_res) <- c("Diseases","Admit")
       aggr_res %>% group_by(Diseases) %>%
         summarise(mean_admit=sum(Admit)) %>%
-        ggplot(aes(x = Diseases, y = mean_admit, fill = Diseases)) +ylab(input$cat)+
+        ggplot(aes(x = Diseases, y = mean_admit, fill = Diseases)) +ylab("Count")+
         geom_bar(stat = "identity") +
         theme(axis.text.x=element_text(size=15, angle=90,hjust = 0.95,vjust=0.2))
       # summarise(aggr_res,mean_ad_male=mean(Admitted_Male),mean_ad_female=mean(Admitted_Female))
@@ -430,7 +430,7 @@ server <-shinyServer(function(input, output,session) {
       names(aggr_res) <- c("Diseases","Death")
       aggr_res %>% group_by(Diseases) %>%
         summarise(mean_death=sum(Death)) %>%
-        ggplot(aes(x = Diseases, y = mean_death, fill = Diseases)) +ylab(input$cat2)+
+        ggplot(aes(x = Diseases, y = mean_death, fill = Diseases)) +ylab('Count')+
         geom_bar(stat = "identity") +
         theme(axis.text.x=element_text(size=15, angle=90,hjust = 0.95,vjust=0.2))
     })
@@ -560,7 +560,7 @@ server <-shinyServer(function(input, output,session) {
                        line = list(color = '#FFFFFF', width = 1)),
          #The 'pull' attribute can also be used to create space between the sectors
          showlegend = TRUE) %>%
-         layout(title = 'Patient Admitted',
+         layout(
                 xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
                 yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE))
         
@@ -586,7 +586,7 @@ server <-shinyServer(function(input, output,session) {
        sum_adm<- admit_res %>% group_by(input$year3) %>% summarise(mean_male=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
        print(sum_adm)
          
-       sum_adm%>%tally(sum_adm$mean_male)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "Total Admitted Patients",color = 'purple')
+       sum_adm%>%tally(sum_adm$mean_male)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "No. of Total Admitted Patients",color = 'purple')
      })
      
      output$total_patients_dead<- renderValueBox({
@@ -597,7 +597,7 @@ server <-shinyServer(function(input, output,session) {
        sum_adm<- admit_res %>% group_by(input$year4) %>% summarise(mean_male=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
        print(sum_adm)
        
-       sum_adm%>%tally(sum_adm$mean_male)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "Total Admitted Patients",color = 'purple')
+       sum_adm%>%tally(sum_adm$mean_male)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "No. of Total Deaths Patients",color = 'purple')
      })
      
      output$dea<- renderPlotly({
@@ -620,7 +620,7 @@ server <-shinyServer(function(input, output,session) {
                                  line = list(color = '#FFFFFF', width = 1)),
                    #The 'pull' attribute can also be used to create space between the sectors
                    showlegend = TRUE) %>%
-         layout(title = 'Patients Died',
+         layout(
                 xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
                 yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
        
@@ -655,9 +655,9 @@ server <-shinyServer(function(input, output,session) {
        p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Male, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
          
        
-         layout(title = 'Patients Admitted (Male)',
-                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE),
-                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE))
+         layout(width=1043,
+                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE,title='Month'),
+                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE,title='Admitted Count'))
        
      })
      output$year_female<- renderPlotly({
@@ -675,9 +675,9 @@ server <-shinyServer(function(input, output,session) {
        p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Female, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
          
          
-         layout(title = 'Patients Admitted (Female)',
-                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE),
-                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE))
+         layout(width=1043,
+                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE,title='Month'),
+                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE,title='Admitted Count'))
        
      })
      
@@ -696,9 +696,9 @@ server <-shinyServer(function(input, output,session) {
        p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Male_Child, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
          
          
-         layout(title = 'Patients Admitted (Male Child)',
-                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE),
-                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE))
+         layout(width=1043,
+                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE,title='Month'),
+                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE,title='Admitted Count'))
        
      })
      output$year_female_child<- renderPlotly({
@@ -714,9 +714,9 @@ server <-shinyServer(function(input, output,session) {
        Month_ordered <- ordered(adm_res$Month,month.name)
        #ggplot(adm_res) + geom_line(mapping = aes(x=Month,y=Admitted_Male,colour=variable))
        p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Female_Child, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
-              layout(title = 'Patients Admitted (Male)',
-                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE),
-                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE))
+              layout(width=1043,
+                xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE,title='Month'),
+                yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE,title='Admitted Count'))
        
      })
      
@@ -753,7 +753,7 @@ server <-shinyServer(function(input, output,session) {
                                  line = list(color = '#FFFFFF', width = 1)),
                    #The 'pull' attribute can also be used to create space between the sectors
                    showlegend = TRUE) %>%
-         layout(title = 'Patients Died',
+         layout(
                 xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
                 yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
        
