@@ -70,15 +70,73 @@ server <-shinyServer(function(input, output,session) {
   
   
   observe({
-    res<- data()%>%filter(data()$Month == input$month & data()$Year == input$year1) %>% select(Diseases,Admitted_Male)
-    result<-data.frame(list(c(res)))
-    #print(result)
+    
+    output$home<- renderPlotly({
+      sum_dis<- data() %>% group_by(Month) %>% summarise(mean_male=mean(Admitted_Male),mean_female=mean(Admitted_Female),mean_child_male=mean(Admitted_Male_Child),mean_child_female=mean(Admitted_Female_Child))
+      #print(sum_dis)
+      dis<-data.frame(sum_dis)
+      sum_admm <- dis %>% group_by(Month) %>% summarise(sum_add=sum(mean_male,mean_female,mean_child_male,mean_child_female))
+      print(sum_admm)
+      
+      
+      
+      
+      
+      print(sum_admm)
+      # p <- plot_ly(sum_admm,x = ~Month, y = ~sum_add, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>%
+      #   layout(xaxis = list(title = 'Months'),
+      #          yaxis = list(title = 'Average'))
+      Month_ordered<- ordered(sum_admm$Month,month.name)
+      
+      p <- plot_ly(sum_admm,x = ~sum_add, y = ~Month_ordered, type = 'bar', orientation = 'h',color = 'black')%>%
+        layout(xaxis = list(title = 'Average Admitted Per Month'),
+               yaxis = list(title = 'Months'))
+      
+      
+    })
+    
+    output$home1<- renderTable({
+      sum_dis<- data() %>% group_by(Diseases) %>% summarise(sum_all=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+      #print(sum_dis)
+      
+      print(sum_dis)
+      
+      data1<- sum_dis %>% arrange(desc(sum_all))
+      print(head(data1,10))
+    })
+    
+    output$total_patients_till_date_male<- renderValueBox({
+      male<-data()
+      #print(male)
+      
+      male%>%tally(male$Admitted_Male)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "Number of Admitted Males",color = 'purple')
+    })
+    
+    output$total_patients_till_date_female<- renderValueBox({
+      female<-data()
+      #print(male)
+      
+      female%>%tally(female$Admitted_Female)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "Number of Admitted Females",color = 'purple')
+    })
+    output$total_patients_till_date_male_child<- renderValueBox({
+      male_child<-data()
+      #print(male)
+      
+      male_child%>%tally(male_child$Admitted_Male_Child)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "Number of Admitted Male Child",color = 'purple')
+    })
+    output$total_patients_till_date_female_child<- renderValueBox({
+      female_child<-data()
+      #print(male)
+      
+      female_child%>%tally(female_child$Admitted_Female_Child)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "Number of Admitted Female Child",color = 'purple')
+    })
+    
     
     plot2<- data()%>%filter(data()$Disease == input$disease & data()$Year == input$year2) %>% select(Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
     plot2dis<- data.frame(list(c(plot2)))
     #plot2dis$month<- factor(plot2dis$month,levels = month.abb)
     #print(input$month)
-    print(plot2dis)
+    #print(plot2dis)
     
     Month_ordered <- ordered(plot2dis$Month,month.name)
     
@@ -106,7 +164,7 @@ server <-shinyServer(function(input, output,session) {
     # print(sum_adm)
     # 
     sum_dis<- lgrres %>% group_by(Month) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
-    print(sum_dis)
+    #print(sum_dis)
     # class(Month)
     # 
     # levels(Month)
@@ -114,7 +172,7 @@ server <-shinyServer(function(input, output,session) {
     # print(tb)
     sum_dis$Month=as.numeric(sum_dis$Month)
     # sum_adm$Diseases=as.numeric(sum_adm$Diseases)
-    str(sum_dis)
+    #str(sum_dis)
     # print(sum_adm)
     # sc<- scale(sum_adm)
     # print(sc)
@@ -382,6 +440,28 @@ server <-shinyServer(function(input, output,session) {
        
      })
      
+     output$total_patients<- renderValueBox({
+       admit<- data()%>% filter(data()$Year==input$year3) %>% select(Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+       admit_res <- data.frame(list(c(admit)))
+       #print(admit_res)
+       
+       sum_adm<- admit_res %>% group_by(input$year3) %>% summarise(mean_male=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       print(sum_adm)
+         
+       sum_adm%>%tally(sum_adm$mean_male)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "Total Admitted Patients",color = 'purple')
+     })
+     
+     output$total_patients_dead<- renderValueBox({
+       admit<- data()%>% filter(data()$Year==input$year4) %>% select(Diseases,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+       admit_res <- data.frame(list(c(admit)))
+       #print(admit_res)
+       
+       sum_adm<- admit_res %>% group_by(input$year4) %>% summarise(mean_male=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
+       print(sum_adm)
+       
+       sum_adm%>%tally(sum_adm$mean_male)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "Total Admitted Patients",color = 'purple')
+     })
+     
      output$dea<- renderPlotly({
        death<- data()%>% filter(data()$Year==input$year4) %>% select(Diseases,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
        death_res <- data.frame(list(c(death)))
@@ -512,7 +592,7 @@ server <-shinyServer(function(input, output,session) {
        sum_death<- admit_res%>% group_by(input$year9) %>% summarise(sum_admm=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
        print(sum_adm)
        print(sum_year)
-       print(sum_death)
+       #print(sum_death)
        
        b<- sum_adm[-1:-2]
        print(b)
@@ -544,6 +624,27 @@ server <-shinyServer(function(input, output,session) {
        # 
        # e<- cbind(d,c)
        # print(e)
+       
+     })
+     
+     output$total_patients_daily <- renderValueBox({
+       admit<- data()%>% filter(data()$Year==input$year9) %>% select(Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+       admit_res <- data.frame(list(c(admit)))
+       print(admit_res)
+       
+       sum_year<- admit_res%>% group_by(input$year9) %>% summarise(sum_admm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+       
+       b<- sum_year[-1]
+       print(b)
+       
+       c<- b/365
+       print(c)
+       
+       print(sum_year$sum_admm <- ifelse(is.na(c$sum_admm), sum_year$sum_admm, c$sum_admm))
+       
+       print(sum_year)
+       
+       sum_year%>%tally(sum_year$sum_admm)%>%pull()%>%as.integer()%>%prettyNum(big.mark = ",")%>%valueBox(subtitle = "Total Admitted Patients",color = 'purple',width = 12)
        
      })
      

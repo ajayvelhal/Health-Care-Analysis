@@ -17,15 +17,13 @@ library(NbClust)
 library(cluster)
 library(shinydashboardPlus)
 # Define UI for application that draws a histogram
-ui <-dashboardPage(skin = "green",
+ui <-dashboardPage(skin = "purple",
                     dashboardHeader(title = span(tagList(icon("file-medical-alt"),"HealthCare Analysis"))),
                     dashboardSidebar(
                       sidebarMenu(
                         menuItem("Upload Data File ", tabName = "dashboard", icon = icon("fas fa-upload")),
                         menuItem("Home Page", tabName = "widgets", icon = icon("fas fa-home")),
-                        menuItem("Diseases", tabName = "disease", icon = icon("fas fa-chart-bar"),
-                                 menuSubItem("Adult",tabName = "Adult",icon = icon("fas fa-user")),
-                                 menuSubItem("Child",tabName = "Child",icon = icon("fas fa-child"))),
+                        menuItem("Diseases", tabName = "Adult", icon = icon("fas fa-chart-bar"),
                         menuItem("Aggregation", tabName = "widgets2", icon = icon("fas fa-network-wired"),
                                  menuSubItem("Admitted",tabName = "Admitted",icon = icon("fas fa-user-injured")),
                                  menuSubItem("Death",tabName = "Death",icon = icon("angle-double-right"))
@@ -79,7 +77,7 @@ ui <-dashboardPage(skin = "green",
                             gradientBox(
                               title = "Browse Here For A File",
                               icon = "fas fa-window-restore",
-                              gradientColor = "green",
+                              gradientColor = "purple",
                               #height = '100px',
                               boxToolSize = 'sm',
                               footer = fileInput("file_da","Upload A CSV File",accept = c("text/csv","text/comma-separated-values","text/plain",".csv"))
@@ -97,50 +95,90 @@ ui <-dashboardPage(skin = "green",
                         ),
                         tabItem(
                           tabName = "widgets",
-                          selectInput('month',"Select Month",""),
-                          selectInput('year1',"Select Year",""),
-                          # fluidRow(
-                          #   infoBox("Sales",1000,icon = icon("warning"))
-                          # ),
-                          plotOutput("plot1")
-                          ),
-                        tabItem(
-                          tabName = "Adult",
                           fluidRow(
                             box(
-                              selectInput('disease',"Select Disease","")
-                              )
+                              width = 12,
+                              valueBoxOutput("total_patients_till_date_male",width = 3),
+                              valueBoxOutput("total_patients_till_date_female",width = 3),
+                              valueBoxOutput("total_patients_till_date_male_child",width = 3),
+                              valueBoxOutput("total_patients_till_date_female_child",width = 3))
+                          ),
+                      br(),
+                        fluidRow(
+                          column(
+                            width=12,
+                            box(
+                              background = 'purple',
+                              title = "Average Patients Admitted Per Month Till Now",
+                              width=8,
+                             plotlyOutput('home') 
                             ),
-                          fluidRow(box(selectInput('year2',"Select Year",""))),
-                          tabBox(width = 10,selected = "Male",
-                            tabPanel(title="Male",
-                                     fluidRow(
-                                        column(
-                                          width=12,
-                                          plotOutput("view_male",height = '300px'))
-                                        )
-                                     ),
-                            tabPanel("Female",width=10,
-                                     fluidRow(
-                                       column(
-                                         width=12,
-                                         plotOutput("view_female",height = '300px')
-                                         )
-                                       )
-                                   )
+                            box(
+                              
+                              title = "Top 10 Diseases",
+                              width=4,
+                              tableOutput('home1') 
                             )
-                          ),
-                            
-                        
-                        tabItem(
-                          tabName = "Child",
-                          tabBox(
-                            tabPanel("Male Child",fluidRow(column(width=12,plotOutput("view_male_child")))),
-                            tabPanel("Female Child",fluidRow(column(width=12,plotOutput("view_female_child"))))
-                          ),
-                          plotOutput("plot2")
+                          )
+                        )
                         ),
                         tabItem(
+                          tabName = 'Adult',
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'purple',
+                                selectInput('disease',"Select Disease","")
+                              ),
+                              box(
+                                background = 'purple',
+                                selectInput('year2',"Select Year","")
+                              )
+                            )
+                          ),
+                          br(),
+                          tabBox(
+                            width = 12,selected = "Male",
+                                 tabPanel(title="Male",
+                                          fluidRow(
+                                            column(
+                                              width=12,
+                                              plotOutput("view_male",height = '400px')
+                                          )
+                                 )
+                                 ),
+                                 tabPanel("Female",width=12,
+                                          fluidRow(
+                                            column(
+                                              width=12,
+                                              plotOutput("view_female",height = '400px')
+                                            )
+                                          )
+                                 ),
+                                 
+                                 tabPanel("Male Child",width=12,
+                                          fluidRow(
+                                            column(
+                                              width=12,
+                                              plotOutput("view_male_child",height = '400px')
+                                            )
+                                          )
+                                 ),
+                                 tabPanel("Female Child",width=12,
+                                          fluidRow(
+                                            column(
+                                              width=12,
+                                              plotOutput("view_female_child",height = '400px')
+                                            )
+                                          )
+                                 )
+                                
+                        
+                        
+                        )
+                        ),
+                      tabItem(
                           tabName = "widgets2"
                           #selectInput('cat',"Select Category",""),
                           #selectInput('year1',"Select Year",""),
@@ -167,11 +205,11 @@ ui <-dashboardPage(skin = "green",
                             column(
                               width=12,
                               box(
-                                background = 'green',
+                                background = 'purple',
                                 selectInput('diss',"Select Disease","")
                               ),
                               box(
-                                background = 'green',
+                                background = 'purple',
                                 selectInput('yearrr',"Select Year","")
                               )
                             )
@@ -188,14 +226,14 @@ ui <-dashboardPage(skin = "green",
                             column(
                               width=12,
                               box(
-                                background = 'green',
+                                background = 'purple',
                                 h3('Summary'),
                                 verbatimTextOutput('txt')
                               ),
                               box(
-                                background = 'green',
+                                background = 'purple',
                                 h3('Prediction'),
-                                collapsible = TRUE,
+                                collapsible = FALSE,
                                   verbatimTextOutput('txt1')
                               )
                             )
@@ -206,14 +244,45 @@ ui <-dashboardPage(skin = "green",
                         tabItem(
                           tabName = "widgets4",
                             #selectInput('month',"Select Month",""),
-                          selectInput('year3',"Select Year",""),
-                          plotlyOutput("adm",height = '500px')
+                          
+                          fluidRow(
+                            box(background = 'purple',
+                              selectInput('year3',"Select Year","")),
+                              valueBoxOutput("total_patients")
+                            
+                          ),
+                          
+                        br(),
+                        fluidRow(
+                          column(
+                            width=12,
+                            box(
+                              width=12,
+                              plotlyOutput("adm",height = '500px')
+                            )
+                          )
+                        )
                         ),
                         tabItem(
                           tabName = "widgets5",
                           #selectInput('month',"Select Month",""),
-                          selectInput('year4',"Select Year",""),
-                          plotlyOutput("dea",height = '500px')
+                          fluidRow(
+                            box(background = 'purple',
+                              selectInput('year4',"Select Year","")),
+                              valueBoxOutput("total_patients_dead")
+                            
+                          ),
+                          br(),
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                width = 12,
+                                plotlyOutput("dea",height = '500px')
+                              )
+                            )
+                          )
+                         
                         ),
                         
                         tabItem(
@@ -248,8 +317,25 @@ ui <-dashboardPage(skin = "green",
                         tabItem(
                           tabName = "widgets8",
                           #selectInput('month',"Select Month",""),
-                          selectInput('year9',"Select Year",""),
-                          plotlyOutput("day",height = '500px')
+                          #selectInput('year9',"Select Year",""),
+                          #plotlyOutput("day",height = '500px')
+                          fluidRow(
+                            box(background = 'purple',
+                                selectInput('year9',"Select Year","")),
+                            valueBoxOutput("total_patients_daily")
+                            
+                          ),
+                          br(),
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                width = 12,
+                                plotlyOutput("day",height = '500px')
+                                
+                              )
+                            )
+                          )
                         )
                         )
                       )
