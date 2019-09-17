@@ -60,7 +60,8 @@ server <-shinyServer(function(input, output,session) {
     updateSelectInput(session,inputId = 'yearrr', label='Select Year', choices = df$Year, selected = df$Year)
     updateSelectInput(session,inputId = 'yearrr', label='Select Year', choices = df$Year, selected = df$Year)
     updateSelectInput(session,inputId = 'clus', label='Select Year', choices = df$Year, selected = df$Year)
-    
+    updateSelectInput(session,inputId = 'yr', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'yr1', label='Select Year', choices = df$Year, selected = df$Year)
     updateSelectInput(session,inputId = 'diss', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
     updateSelectInput(session,inputId = 'dis', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
     updateSelectInput(session,inputId = 'dis1', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
@@ -74,7 +75,7 @@ server <-shinyServer(function(input, output,session) {
   
   observe({
     
-    #---------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------
     #HomePage Plot
     output$home<- renderPlotly({
       sum_dis<- data() %>% group_by(Month) %>% summarise(mean_male=mean(Admitted_Male),mean_female=mean(Admitted_Female),mean_child_male=mean(Admitted_Male_Child),mean_child_female=mean(Admitted_Female_Child))
@@ -131,7 +132,7 @@ server <-shinyServer(function(input, output,session) {
       paste("This")
     })
     
-    #---------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     #seasonalPlot
     
     if(input$weather=='winter'){
@@ -335,19 +336,19 @@ server <-shinyServer(function(input, output,session) {
     
     output$view_male<- renderPlot({
      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Male)) + geom_bar(stat="identity",color='purple',fill='purple') + xlab("Month") +
-        ylab("Admitted Male Patients") + theme_minimal()
+        ylab("Admitted Male Patients") + theme_classic()
     })
     
     output$view_female<- renderPlot({
-      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Female)) + geom_bar(stat="identity",color='purple',fill='white') + xlab("Month") +
+      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Female)) + geom_bar(stat="identity",fill='purple') + xlab("Month") +
         ylab("Admitted Female Patients") 
     })
     output$view_male_child<- renderPlot({
-      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Male_Child)) + geom_bar(stat="identity",color='purple',fill='white') + xlab("Month") +
+      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Male_Child)) + geom_bar(stat="identity",fill='purple') + xlab("Month") +
         ylab("Admitted Male-Child Patients") 
     })
     output$view_female_child <- renderPlot({
-      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Female_Child)) + geom_bar(stat="identity",color='purple',fill='white') + xlab("Month") +
+      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Female_Child)) + geom_bar(stat="identity",fill='purple') + xlab("Month") +
         ylab("Admitted Female-Child Patients") 
     })
     
@@ -361,18 +362,15 @@ server <-shinyServer(function(input, output,session) {
     #   with(clust_res,text(Admitted_Male ~ Death_Male,labels= Diseases))
     # })
     #Seasonal Diseases
-    output$s1<- renderTable({
-      
-    })
+    
     #aggregation of admitted persons
     output$aggr1 <- renderPlot({
-      aggr<- data()%>% filter(data()$Year =='2017')%>% select(Diseases,input$cat)
+      aggr<- data()%>% filter(data()$Year ==input$yr)%>% select(Diseases,input$cat)
       aggr_res <- data.frame(list(c(aggr)))
       glimpse(aggr_res)
       names(aggr_res) <- c("Diseases","Admit")
       aggr_res %>% group_by(Diseases) %>%
-        summarise(mean_admit=
-                    (Admit)) %>%
+        summarise(mean_admit=mean(Admit)) %>%
         ggplot(aes(x = Diseases, y = mean_admit, fill = Diseases)) +ylab("Count")+
         geom_bar(stat = "identity") +
         theme(axis.text.x=element_text(size=15, angle=90,hjust = 0.95,vjust=0.2))
@@ -424,12 +422,12 @@ server <-shinyServer(function(input, output,session) {
     #Aggregation of death persons
     
     output$aggr2<- renderPlot({
-      aggr<- data()%>% filter(data()$Year =='2017')%>% select(Diseases,input$cat2)
+      aggr<- data()%>% filter(data()$Year ==input$yr1)%>% select(Diseases,input$cat2)
       aggr_res <- data.frame(list(c(aggr)))
       glimpse(aggr_res)
       names(aggr_res) <- c("Diseases","Death")
       aggr_res %>% group_by(Diseases) %>%
-        summarise(mean_death=sum(Death)) %>%
+        summarise(mean_death=mean(Death)) %>%
         ggplot(aes(x = Diseases, y = mean_death, fill = Diseases)) +ylab('Count')+
         geom_bar(stat = "identity") +
         theme(axis.text.x=element_text(size=15, angle=90,hjust = 0.95,vjust=0.2))
@@ -794,58 +792,62 @@ server <-shinyServer(function(input, output,session) {
        
      })
      
+     
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------
+     #Clustering
+     admit<- data()%>% filter(data()$Year==input$clus) %>% select(Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+     admit_res <- data.frame(list(c(admit)))
+     #print(admit_res)
+     
+     colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
+     
+     sum_adm<- admit_res %>% group_by(Diseases) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
+     #print(sum_adm)
+     #print(mean_adm)
+     
+     death<- data()%>% filter(data()$Year==input$clus) %>% select(Diseases,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
+     death_res <- data.frame(list(c(death)))
+     #print(death_res)
+     
+     #colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
+     
+     sum_death<- death_res %>% group_by(Diseases) %>% summarise(mean_death=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
+     #print(sum_death)
+     
+     bin <- cbind(sum_adm,sum_death)
+     print(bin)
+     
+     bin_f<- bin[-1]
+     #print(bin_f)
+     
+     bin_ff<- bin_f[-2]
+     print(bin_ff)
+     
+     a <- scale(bin_ff)
+     print(head(a))
+     
+     a_rest<- data.frame((a))
+     print(head(a_rest))
+     # a<-apply(sum_adm,2,mean)
+     # s<-apply(sum_adm,2,sd)
+     # sum_adm<-scale(sum_adm,a,s)
+     # 
+     # distance <- dist(sum_adm)
+     # print(distance,digits = 5)
+     #ggplot(a_rest,aes(a_rest$mean_adm,a_rest$mean_death)) + geom_point() + theme_classic()
+     #s <- seq(-1, 10)
+     #p <- plot_ly(data = a_rest, x = ~a_rest$mean_adm, y = ~a_rest$mean_death)
      #Clustering final
      output$scat<- renderPlot({
-       admit<- data()%>% filter(data()$Year==input$clus) %>% select(Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
-       admit_res <- data.frame(list(c(admit)))
-       #print(admit_res)
        
-       colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
-       
-       sum_adm<- admit_res %>% group_by(Diseases) %>% summarise(mean_adm=sum(Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child))
-       #print(sum_adm)
-       #print(mean_adm)
-       
-       death<- data()%>% filter(data()$Year=='2018') %>% select(Diseases,Death_male,Death_Female,Death_Male_Child,Death_Female_Child)
-       death_res <- data.frame(list(c(death)))
-       #print(death_res)
-       
-       #colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
-       
-       sum_death<- death_res %>% group_by(Diseases) %>% summarise(mean_death=sum(Death_male,Death_Female,Death_Male_Child,Death_Female_Child))
-       #print(sum_death)
-       
-       bin <- cbind(sum_adm,sum_death)
-       print(bin)
-       
-       bin_f<- bin[-1]
-       #print(bin_f)
-       
-       bin_ff<- bin_f[-2]
-       print(bin_ff)
-       
-       a <- scale(bin_ff)
-       print(head(a))
-       
-       a_rest<- data.frame((a))
-       print(head(a_rest))
-       # a<-apply(sum_adm,2,mean)
-       # s<-apply(sum_adm,2,sd)
-       # sum_adm<-scale(sum_adm,a,s)
-       # 
-       # distance <- dist(sum_adm)
-       # print(distance,digits = 5)
-       #ggplot(a_rest,aes(a_rest$mean_adm,a_rest$mean_death)) + geom_point() + theme_classic()
-       #s <- seq(-1, 10)
-       #p <- plot_ly(data = a_rest, x = ~a_rest$mean_adm, y = ~a_rest$mean_death)
        
        results<- kmeans(a_rest,4,nstart=25)
        print(results)
        
        print(results$size)
        
-       print(results$cluster)
-       print(table(bin$Diseases,results$cluster))
+       #print(results$cluster)
+       #print(table(bin$Diseases,results$cluster))
        # # set.seed(123)
        # # k.max<- 15
        # # data<- a_rest
@@ -867,9 +869,31 @@ server <-shinyServer(function(input, output,session) {
        # fviz_nbclust(a_rest, kmeans, nstart = 25,  method = "gap_stat", nboot = 50)+
        #   labs(subtitle = "Gap statistic method")
        #clusplot(a_rest,results$cluster,main = '2D Representation',labels = 2,lines = 0)
-       fviz_cluster(results,data=a_rest)
+       fviz_cluster(results,data=a_rest,xlab = "Admitted Patients", ylab = "Death Patients")+theme_classic()
        # plot3d(pcdf$scores, col=newdf$K)#Create a 3D plot
        
+       
+     })
+     
+     output$clusttb<-renderDataTable({
+       results<- kmeans(a_rest,4,nstart=25)
+       
+        print(head(bin))
+        aj<- bin$Diseases
+        print(aj)
+       # 
+        abc<-data.frame(results$cluster)
+        print(table(aj,results$cluster))
+        bind<- cbind(aj,abc)
+        print(bind)
+        colnames(bind)<-c("Diseases","Cluster`")
+       #str(bind)
+       # bind_frame<-data.frame(bind)
+       # bind_frame$Diseases=as.factor(bind_frame$Diseases)
+       datatable(bind)
+       
+       
+       #datatable(bind)
        
      })
      

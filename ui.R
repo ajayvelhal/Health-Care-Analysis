@@ -17,6 +17,9 @@ library(NbClust)
 library(cluster)
 library(shinydashboardPlus)
 library(scales)
+library(data.table)
+library(DT)
+library(knitr)
 # Define UI for application that draws a histogram
 ui <-dashboardPage(skin = "purple",
                     dashboardHeader(title = span(tagList(icon("file-medical-alt"),"HealthCare Analysis"))),
@@ -220,9 +223,12 @@ ui <-dashboardPage(skin = "purple",
                             column(
                               width=12,
                               box(
-                               
                                 background = 'purple',
                                 selectInput('cat','Select Category',"")
+                              ),
+                              box(
+                                background = 'purple',
+                                selectInput('yr','Select Year',"")
                               )
                             )
                           ),
@@ -249,7 +255,10 @@ ui <-dashboardPage(skin = "purple",
                               box(
                                 background = 'purple',
                                 selectInput('cat2','Select Category',"")
-                                
+                              ),
+                              box(
+                                background = 'purple',
+                                selectInput('yr1','Select Year',"")
                               )
                             )
                           ),
@@ -492,7 +501,7 @@ ui <-dashboardPage(skin = "purple",
                               box(
                                 width=4,
                                 title = "Clusters Information",
-                                tableOutput('clusttb')
+                                dataTableOutput('clusttb')
                               )
                             )
                           )
@@ -515,6 +524,7 @@ ui <-dashboardPage(skin = "purple",
                             column(
                               width=12,
                               box(
+                                background = 'purple',
                                 width = 12,
                                 plotlyOutput("day",height = '500px')
                                 
