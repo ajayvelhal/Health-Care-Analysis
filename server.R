@@ -58,6 +58,9 @@ server <-shinyServer(function(input, output,session) {
     updateSelectInput(session,inputId = 'year8', label='Select Year', choices = df$Year, selected = df$Year)
     updateSelectInput(session,inputId = 'year9', label='Select Year', choices = df$Year, selected = df$Year)
     updateSelectInput(session,inputId = 'yearrr', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'yearrr', label='Select Year', choices = df$Year, selected = df$Year)
+    updateSelectInput(session,inputId = 'clus', label='Select Year', choices = df$Year, selected = df$Year)
+    
     updateSelectInput(session,inputId = 'diss', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
     updateSelectInput(session,inputId = 'dis', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
     updateSelectInput(session,inputId = 'dis1', label='Select Disease', choices = df$Diseases, selected = df$Diseases)
@@ -71,17 +74,13 @@ server <-shinyServer(function(input, output,session) {
   
   observe({
     
+    #---------------------------------------------------------------------------------------------------------------------
+    #HomePage Plot
     output$home<- renderPlotly({
       sum_dis<- data() %>% group_by(Month) %>% summarise(mean_male=mean(Admitted_Male),mean_female=mean(Admitted_Female),mean_child_male=mean(Admitted_Male_Child),mean_child_female=mean(Admitted_Female_Child))
-      #print(sum_dis)
       dis<-data.frame(sum_dis)
       sum_admm <- dis %>% group_by(Month) %>% summarise(sum_add=sum(mean_male,mean_female,mean_child_male,mean_child_female))
       print(sum_admm)
-      
-      
-      
-      
-      
       print(sum_admm)
       # p <- plot_ly(sum_admm,x = ~Month, y = ~sum_add, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>%
       #   layout(xaxis = list(title = 'Months'),
@@ -91,8 +90,6 @@ server <-shinyServer(function(input, output,session) {
       p <- plot_ly(sum_admm,x = ~sum_add, y = ~Month_ordered, type = 'bar', orientation = 'h',color = 'black')%>%
         layout(xaxis = list(title = 'Average Admitted Per Month'),
                yaxis = list(title = 'Months'))
-      
-      
     })
     
     output$home1<- renderTable({
@@ -133,7 +130,9 @@ server <-shinyServer(function(input, output,session) {
     output$s1<- renderPlot({
       paste("This")
     })
-    #seasonal
+    
+    #---------------------------------------------------------------------------------------------------------------------
+    #seasonalPlot
     
     if(input$weather=='winter'){
       win<-data()%>%filter(data()$Month=='October')%>% select(Diseases,Month,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
@@ -335,20 +334,20 @@ server <-shinyServer(function(input, output,session) {
     #print(plot2dis)
     
     output$view_male<- renderPlot({
-     ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Male)) + geom_bar(stat="identity") + xlab("Month") +
-        ylab("Admitted Male Patients") 
+     ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Male)) + geom_bar(stat="identity",color='purple',fill='purple') + xlab("Month") +
+        ylab("Admitted Male Patients") + theme_minimal()
     })
     
     output$view_female<- renderPlot({
-      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Female)) + geom_bar(stat="identity") + xlab("Month") +
+      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Female)) + geom_bar(stat="identity",color='purple',fill='white') + xlab("Month") +
         ylab("Admitted Female Patients") 
     })
     output$view_male_child<- renderPlot({
-      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Male_Child)) + geom_bar(stat="identity") + xlab("Month") +
+      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Male_Child)) + geom_bar(stat="identity",color='purple',fill='white') + xlab("Month") +
         ylab("Admitted Male-Child Patients") 
     })
     output$view_female_child <- renderPlot({
-      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Female_Child)) + geom_bar(stat="identity") + xlab("Month") +
+      ggplot(plot2dis,aes(x=Month_ordered,y=Admitted_Female_Child)) + geom_bar(stat="identity",color='purple',fill='white') + xlab("Month") +
         ylab("Admitted Female-Child Patients") 
     })
     
@@ -372,7 +371,8 @@ server <-shinyServer(function(input, output,session) {
       glimpse(aggr_res)
       names(aggr_res) <- c("Diseases","Admit")
       aggr_res %>% group_by(Diseases) %>%
-        summarise(mean_admit=sum(Admit)) %>%
+        summarise(mean_admit=
+                    (Admit)) %>%
         ggplot(aes(x = Diseases, y = mean_admit, fill = Diseases)) +ylab("Count")+
         geom_bar(stat = "identity") +
         theme(axis.text.x=element_text(size=15, angle=90,hjust = 0.95,vjust=0.2))
@@ -453,9 +453,16 @@ server <-shinyServer(function(input, output,session) {
        # levels(Month)
        # tb<- full_join(sum_adm,sum_dis,by="Month")
        # print(tb)
+       #sum_dis$Month<- month.name[sum_dis$Month]
        sum_dis$Month=as.numeric(sum_dis$Month)
        # sum_adm$Diseases=as.numeric(sum_adm$Diseases)
        str(sum_dis)
+       
+       # print(sum_dis)
+       # 
+       # sum_dis$Month<- month.abb[sum_dis$Month]
+       #  
+       # print(sum_dis)
        # print(sum_adm)
        # sc<- scale(sum_adm)
        # print(sc)
@@ -482,7 +489,8 @@ server <-shinyServer(function(input, output,session) {
        # print(b)
        
     
-       ggplot(sum_dis,aes(Month,mean_adm)) + geom_point() + geom_smooth(method = "lm")
+       ggplot(sum_dis,aes(Month,mean_adm)) + geom_point() + geom_smooth(method = "lm")+xlab("Months")+ylab("Admitted Patients Count")+ scale_x_continuous(labels = as.character(sum_dis$Month), breaks = sum_dis$Month)
+
       
        
     })
@@ -531,7 +539,7 @@ server <-shinyServer(function(input, output,session) {
        #str(sum_dis)
        linear <- lm(mean_adm~Month,sum_dis)
        #print(summary(linear))
-       print(predict(linear,Month='12',interval="predict"))
+       print(predict(linear,Month='December',interval="predict"))
      })
      
      #Pie graph for Admitted
@@ -652,7 +660,7 @@ server <-shinyServer(function(input, output,session) {
        
        Month_ordered <- ordered(adm_res$Month,month.name)
       #ggplot(adm_res) + geom_line(mapping = aes(x=Month,y=Admitted_Male,colour=variable))
-       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Male, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
+       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Male, type = 'scatter', mode = 'lines+markers',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
          
        
          layout(width=1043,
@@ -672,7 +680,7 @@ server <-shinyServer(function(input, output,session) {
        
        Month_ordered <- ordered(adm_res$Month,month.name)
        #ggplot(adm_res) + geom_line(mapping = aes(x=Month,y=Admitted_Male,colour=variable))
-       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Female, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
+       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Female, type = 'scatter', mode = 'lines+markers',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
          
          
          layout(width=1043,
@@ -693,7 +701,7 @@ server <-shinyServer(function(input, output,session) {
        
        Month_ordered <- ordered(adm_res$Month,month.name)
        #ggplot(adm_res) + geom_line(mapping = aes(x=Month,y=Admitted_Male,colour=variable))
-       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Male_Child, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
+       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Male_Child, type = 'scatter', mode = 'lines+markers',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
          
          
          layout(width=1043,
@@ -713,7 +721,7 @@ server <-shinyServer(function(input, output,session) {
        
        Month_ordered <- ordered(adm_res$Month,month.name)
        #ggplot(adm_res) + geom_line(mapping = aes(x=Month,y=Admitted_Male,colour=variable))
-       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Female_Child, type = 'scatter', mode = 'lines',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
+       p <- plot_ly(adm_res, x = ~Month_ordered, y = ~Admitted_Female_Child, type = 'scatter', mode = 'lines+markers',linetype = ~Year ,showlegend= TRUE,width = 4,line = list(color = 'rgb(22, 96, 167)'))%>% 
               layout(width=1043,
                 xaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE,title='Month'),
                 yaxis = list(showgrid = TRUE, zeroline = TRUE, showticklabels = TRUE,title='Admitted Count'))
@@ -788,7 +796,7 @@ server <-shinyServer(function(input, output,session) {
      
      #Clustering final
      output$scat<- renderPlot({
-       admit<- data()%>% filter(data()$Year=='2018') %>% select(Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
+       admit<- data()%>% filter(data()$Year==input$clus) %>% select(Diseases,Admitted_Male,Admitted_Female,Admitted_Male_Child,Admitted_Female_Child)
        admit_res <- data.frame(list(c(admit)))
        #print(admit_res)
        
@@ -861,7 +869,11 @@ server <-shinyServer(function(input, output,session) {
        #clusplot(a_rest,results$cluster,main = '2D Representation',labels = 2,lines = 0)
        fviz_cluster(results,data=a_rest)
        # plot3d(pcdf$scores, col=newdf$K)#Create a 3D plot
+       
+       
      })
+     
+     
   }) # observe ends
   
   

@@ -16,6 +16,7 @@ library(factoextra)
 library(NbClust)
 library(cluster)
 library(shinydashboardPlus)
+library(scales)
 # Define UI for application that draws a histogram
 ui <-dashboardPage(skin = "purple",
                     dashboardHeader(title = span(tagList(icon("file-medical-alt"),"HealthCare Analysis"))),
@@ -468,8 +469,35 @@ ui <-dashboardPage(skin = "purple",
                         ),
                         tabItem(
                           tabName = "widgets7",
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                background = 'purple',
+                                h3("Clustering"),
+                                selectInput('clus',"Select Year","")
+                              )
+                            )
+                          ),
+                          br(),
+                          fluidRow(
+                            column(
+                              width=12,
+                              box(
+                                width = 8,
+                                background = "purple",
+                                title = "Plot",
+                                plotOutput("scat",height = '600px')
+                              ),
+                              box(
+                                width=4,
+                                title = "Clusters Information",
+                                tableOutput('clusttb')
+                              )
+                            )
+                          )
                           #selectInput('dis3','Select Disease',""),
-                          plotOutput("scat",height = '600px')
+                          
                         ),
                         tabItem(
                           tabName = "widgets8",
