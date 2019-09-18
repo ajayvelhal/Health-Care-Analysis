@@ -27,16 +27,16 @@ ui <-dashboardPage(skin = "purple",
                       sidebarMenu(
                         menuItem("Upload Data File ", tabName = "dashboard", icon = icon("fas fa-upload")),
                         menuItem("Home Page", tabName = "widgets", icon = icon("fas fa-home")),
-                        menuItem("Diseases", tabName = "Adult", icon = icon("fas fa-chart-bar")),
-                        menuItem("Aggregation", tabName = "widgets2", icon = icon("fas fa-network-wired"),
-                                 menuSubItem("Admitted",tabName = "Admitted",icon = icon("fas fa-user-injured")),
-                                 menuSubItem("Death",tabName = "Death",icon = icon("angle-double-right"))
+                        menuItem("Admitted Patients", tabName = "Adult", icon = icon("fas fa-chart-bar")),
+                        menuItem("Average Patients", tabName = "widgets2", icon = icon("signal"),
+                                 menuSubItem("Admitted",tabName = "Admitted",icon = icon("syringe")),
+                                 menuSubItem("Death",tabName = "Death",icon = icon("heartbeat"))
                       ),
-                      menuItem("Season", tabName = "season", icon = icon("fas fa-chart-bar")),
+                      menuItem("Season-Wise Admission", tabName = "season", icon = icon("cloud")),
                         menuItem("Linear Regression", tabName = "widgets3", icon = icon("fas fa-chart-bar")),
-                        menuItem("Admission Year Vise", tabName = "widgets4", icon = icon("fas fa-chart-pie")),
-                        menuItem("Death Year Vise", tabName = "widgets5", icon = icon("fas fa-chart-pie")),
-                        menuItem("Month Trend", tabName = "widgets6", icon = icon("fas fa-chart-line"),
+                        menuItem("Yearly Admissions", tabName = "widgets4", icon = icon("fas fa-chart-pie")),
+                        menuItem("Yearly Deaths", tabName = "widgets5", icon = icon("fas fa-chart-pie")),
+                        menuItem("Monthly Trend", tabName = "widgets6", icon = icon("fas fa-chart-line"),
                                  menuSubItem("Male",tabName = "Male",icon = icon("fas fa-male")),
                                  menuSubItem("Female",tabName = "Female",icon = icon("fas fa-female")),
                                  menuSubItem("Male Child",tabName = "Male_Child",icon = icon("fas fa-child")),
@@ -50,33 +50,7 @@ ui <-dashboardPage(skin = "purple",
                       tabItems(
                         tabItem(
                           tabName = "dashboard",
-                          
-                            # box(fileInput("file_da","Upload A CSV File",accept = c("text/csv","text/comma-separated-values","text/plain",".csv")),
-                            #     title = span(tagList(icon("fas fa-upload"), "Browse Here For A File")),
-                            #     plotOutput('da',height = "600px"),height = "150px"
-                            # 
-                            # )   
-                        #    fluidRow(column(
-                        #     width = 6,
-                        #     box(
-                        #       status = "primary", solidHeader = TRUE,
-                        #       width = 12,
-                        #       title = span(tagList(icon("fas fa-window-restore"), "Browse Here For The File"))
-                        # ,
-                        # fluidRow(
-                        #   column(width = 3,
-                        #           tags$div(HTML('<i class="fas fa-upload"></i>'))
-                        #   ),
-                        #   column(width = 12,
-                        #          fileInput("file_da","Upload A CSV File",accept = c("text/csv","text/comma-separated-values","text/plain",".csv"))
-                        # )
-                        # 
-                        # )
-                        #     )
-                        # 
-                        # ))
-                        
-                        fluidRow(
+                            fluidRow(
                           column(
                             width=12,
                             gradientBox(
@@ -102,6 +76,8 @@ ui <-dashboardPage(skin = "purple",
                           tabName = "widgets",
                           fluidRow(
                             box(
+                              background = 'black',
+                              title = "Total Admitted Patients (2017-18)",
                               width = 12,
                               valueBoxOutput("total_patients_till_date_male",width = 3),
                               valueBoxOutput("total_patients_till_date_female",width = 3),
@@ -114,7 +90,7 @@ ui <-dashboardPage(skin = "purple",
                             width=12,
                             box(
                               background = 'purple',
-                              title = "Average Patients Admitted Per Month Till Now",
+                              title = "Average Patients Admitted Per Month (2017-18)",
                               width=8,
                              plotlyOutput('home') 
                             ),
