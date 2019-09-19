@@ -27,13 +27,15 @@ ui <-dashboardPage(skin = "purple",
                       sidebarMenu(
                         menuItem("Upload Data File ", tabName = "dashboard", icon = icon("fas fa-upload")),
                         menuItem("Home Page", tabName = "widgets", icon = icon("fas fa-home")),
+                        menuItem("Season-Wise Admission", tabName = "season", icon = icon("cloud",lib="font-awesome")),
                         menuItem("Admitted Patients", tabName = "Adult", icon = icon("fas fa-chart-bar")),
+                        menuItem("Clustering", tabName = "widgets7", icon = icon("far fa-object-group")),
+                        menuItem("Linear Regression", tabName = "widgets3", icon = icon("fas fa-chart-bar")),
                         menuItem("Average Patients", tabName = "widgets2", icon = icon("signal"),
                                  menuSubItem("Admitted",tabName = "Admitted",icon = icon("syringe")),
                                  menuSubItem("Death",tabName = "Death",icon = icon("heartbeat"))
                       ),
-                      menuItem("Season-Wise Admission", tabName = "season", icon = icon("cloud")),
-                        menuItem("Linear Regression", tabName = "widgets3", icon = icon("fas fa-chart-bar")),
+                        
                         menuItem("Yearly Admissions", tabName = "widgets4", icon = icon("fas fa-chart-pie")),
                         menuItem("Yearly Deaths", tabName = "widgets5", icon = icon("fas fa-chart-pie")),
                         menuItem("Monthly Trend", tabName = "widgets6", icon = icon("fas fa-chart-line"),
@@ -41,8 +43,8 @@ ui <-dashboardPage(skin = "purple",
                                  menuSubItem("Female",tabName = "Female",icon = icon("fas fa-female")),
                                  menuSubItem("Male Child",tabName = "Male_Child",icon = icon("fas fa-child")),
                                  menuSubItem("Female Child",tabName = "Female_Child",icon = icon("fas fa-child"))),
-                      menuItem("Average Daily Patients", tabName = "widgets8", icon = icon("fas fa-chart-pie")),
-                      menuItem("Clustering", tabName = "widgets7", icon = icon("far fa-object-group"))
+                      menuItem("Average Daily Patients", tabName = "widgets8", icon = icon("fas fa-chart-pie"))
+                      
                       
                       )
                     ),
