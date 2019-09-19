@@ -461,7 +461,6 @@ ui <-dashboardPage(skin = "purple",
                               width=12,
                               box(
                                 background = 'purple',
-                                h3("Clustering"),
                                 selectInput('clus',"Select Year","")
                               )
                             )

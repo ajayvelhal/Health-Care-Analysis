@@ -137,7 +137,7 @@ server <-shinyServer(function(input, output,session) {
       output$season12<- renderPlotly({
         p<-plot_ly(resultseason,x = ~sum_sum1, y = ~Diseases, type = 'bar',orientation='h',color = 'black')%>%
           layout(xaxis = list(title = 'Patients Count'),
-                 yaxis = list(title = 'Diseasess'))
+                 yaxis = list(title = 'Diseases'))
       })
     
       output$home2<- renderTable({
@@ -172,8 +172,8 @@ server <-shinyServer(function(input, output,session) {
      
       output$season12<- renderPlotly({
         p<-plot_ly(resultseason,x = ~sum_sum1, y = ~Diseases, type = 'bar',orientation='h',color = 'black')%>%
-           layout(xaxis = list(title = 'Average Admitted Per Month'),
-                  yaxis = list(title = 'Months'))
+           layout(xaxis = list(title = 'Patients Count'),
+                  yaxis = list(title = 'Diseases'))
       })
       
       output$home2<- renderTable({
@@ -213,8 +213,8 @@ server <-shinyServer(function(input, output,session) {
  
       output$season12<- renderPlotly({
         p<-plot_ly(resultseason,x = ~sum_sum1, y = ~Diseases, type = 'bar',orientation='h',color = 'black')%>%
-          layout(xaxis = list(title = 'Average Admitted Per Month'),
-                 yaxis = list(title = 'Months'))
+          layout(xaxis = list(title = 'Patients Count'),
+                 yaxis = list(title = 'Diseases'))
       })
       
       output$home2<- renderTable({
